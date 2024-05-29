@@ -1,5 +1,6 @@
-import application from "../routers/application.router";
+import application from '../routers/application.router';
+import customer from '../routers/customer.router';
 
-const routes = [application];
+const routes = [application, customer];
 
 export default routes;
