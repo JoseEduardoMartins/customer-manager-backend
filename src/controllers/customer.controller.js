@@ -1,4 +1,6 @@
 import repository from '../repositories/customer.repository.js';
+import repositoryCustomerTag from '../repositories/customer-tag.repository.js';
+import repositoryTag from '../repositories/tag.repository.js';
 
 export const find = async (req, res) => {
     try {
@@ -16,9 +18,20 @@ export const findById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
-        const response = await repository.selectById(id);
+        const customer = await repository.selectById(id);
 
-        res.status(200).json(response);
+        const tags = await repositoryCustomerTag.select({
+            filters: {
+                customer_id: id,
+            },
+        });
+
+        console.log(tags);
+
+        res.status(200).json({
+            ...customer,
+            tags,
+        });
     } catch (error) {
         res.status(500).json(error);
     }
@@ -26,11 +39,34 @@ export const findById = async (req, res) => {
 
 export const save = async (req, res) => {
     try {
-        const contact = req.body;
+        const { tags, ...customer } = req.body;
 
-        const response = await repository.insert(contact);
+        const { id } = await repository.insert(customer);
 
-        res.status(201).json(response);
+        for (let i = 0; i < tags.length; i++) {
+            const { title } = tags[i];
+
+            const [tag] = await repositoryTag.select({
+                filters: {
+                    title,
+                },
+            });
+
+            if (tag)
+                repositoryCustomerTag.insert({
+                    customer_id: id,
+                    tag_id: tag.id,
+                });
+            else {
+                const responseTag = await repositoryTag.insert({ title });
+                repositoryCustomerTag.insert({
+                    customer_id: id,
+                    tag_id: responseTag.id,
+                });
+            }
+        }
+
+        res.status(201).json({ id });
     } catch (error) {
         res.status(500).json(error);
     }
@@ -39,10 +75,36 @@ export const save = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const id = Number(req.params.id);
-        const contact = req.body;
+        const { tags, ...customer } = req.body;
 
-        const response = await repository.update(id, contact);
-        if (response === null) return res.status(404).json({ message: 'Not found' });
+        const responseCustomer = await repository.update(id, customer);
+        if (responseCustomer === null) return res.status(404).json({ message: 'Not found' });
+
+        const responseCustomerTag = repositoryCustomerTag.remove({ customer_id: id });
+        if (responseCustomerTag === null) return res.status(404).json({ message: 'Not found' });
+
+        for (let i = 0; i < tags.length; i++) {
+            const { title } = tags[i];
+
+            const [tag] = await repositoryTag.select({
+                filters: {
+                    title,
+                },
+            });
+
+            if (tag)
+                repositoryCustomerTag.insert({
+                    customer_id: id,
+                    tag_id: tag.id,
+                });
+            else {
+                const responseTag = await repositoryTag.insert({ title });
+                repositoryCustomerTag.insert({
+                    customer_id: id,
+                    tag_id: responseTag.id,
+                });
+            }
+        }
 
         res.sendStatus(204);
     } catch (error) {
@@ -53,6 +115,9 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
     try {
         const id = Number(req.params.id);
+
+        const responseCustomerTag = repositoryCustomerTag.remove({ customer_id: id });
+        if (responseCustomerTag === null) return res.status(404).json({ message: 'Not found' });
 
         const response = await repository.remove(id);
         if (response === null) return res.status(404).json({ message: 'Not found' });
