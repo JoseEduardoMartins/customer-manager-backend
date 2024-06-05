@@ -4,9 +4,9 @@ import repositoryTag from '../repositories/tag.repository.js';
 
 export const find = async (req, res) => {
     try {
-        const filters = req.query;
+        const { selects, ...filters } = req.query;
 
-        const response = await repository.select({ filters });
+        const response = await repository.select({ selects, filters });
 
         res.status(200).json(response);
     } catch (error) {
@@ -26,11 +26,9 @@ export const findById = async (req, res) => {
             },
         });
 
-        console.log(tags);
-
         res.status(200).json({
             ...customer,
-            tags,
+            ...(tags && { tags }),
         });
     } catch (error) {
         res.status(500).json(error);

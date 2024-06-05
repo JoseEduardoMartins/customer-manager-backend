@@ -1,13 +1,13 @@
 import { CustomerTag, CustomerTagResponse } from '../models/customer-tag.model.js';
 import { runQuery } from '../config/database.js';
 import { typeValidators } from '../utils/type-utils.js';
-import { getQueryFilters } from '../utils/sql/queries.js';
-import { customerTagParameters } from '../utils/sql/customer-tag.query.js';
+import { getQuerySelects, getQueryFilters } from '../utils/sql/queries.js';
+import { customerTagReturnTypes, customerTagSelect, customerTagParameters } from '../utils/sql/customer-tag.query.js';
 
-export const select = async ({ filters = {} }) => {
+export const select = async ({ selects = customerTagReturnTypes.middle, filters = {} }) => {
     try {
         const query = `
-            SELECT tag.*
+            SELECT ${getQuerySelects(selects, customerTagSelect)}
             FROM customer_tag
             LEFT JOIN tag on customer_tag.tag_id = tag.id
             ${getQueryFilters(filters, customerTagParameters)}
@@ -18,7 +18,6 @@ export const select = async ({ filters = {} }) => {
         const customerTag = response.map((customer_tag) => new CustomerTagResponse(customer_tag));
         return customerTag;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };
@@ -58,13 +57,15 @@ export const update = async (id, customer_tag) => {
 };
 
 export const remove = async (filters) => {
-    const { customer_id } = customerTagParameters;
+    const { customer_id, tag_id } = customerTagParameters;
 
     try {
         const query = `
             DELETE FROM customer_tag
-            ${getQueryFilters(filters, { customer_id })}
+            ${getQueryFilters(filters, { customer_id, tag_id })}
         `;
+
+        console.log(query);
 
         const response = await runQuery(query);
 

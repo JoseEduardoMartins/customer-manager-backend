@@ -1,13 +1,13 @@
 import { Tag } from '../models/tag.model';
 import { runQuery } from '../config/database';
 import { typeValidators } from '../utils/type-utils';
-import { getQueryFilters } from '../utils/sql/queries';
-import { tagParameters } from '../utils/sql/tag.query';
+import { getQuerySelects, getQueryFilters } from '../utils/sql/queries';
+import { tagReturnTypes, tagSelect, tagParameters } from '../utils/sql/tag.query';
 
-export const select = async ({ filters = {} }) => {
+export const select = async ({ selects = tagReturnTypes.middle, filters = {} }) => {
     try {
         const query = `
-            SELECT *
+            SELECT ${getQuerySelects(selects, tagSelect)}
             FROM tag
             ${getQueryFilters(filters, tagParameters)}
         `;
