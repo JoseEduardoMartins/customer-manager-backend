@@ -79,6 +79,22 @@ Acesse a API para gerenciar os clientes e suas tags.
 }
 ```
 
+Acesse a API para gerenciar as tags.
+
+-   Listar todos os tags: GET /tags/
+-   Obter um tag específico: GET /tags/:id
+-   Criar um novo tag: POST /tags/
+-   Atualizar um tag existente: PUT /tags/:id
+-   Excluir um tag: DELETE /tags/:id
+
+## Exemplo de Payload para Criação/Atualização de Tag
+
+```script
+{
+    "title": "Titulo da tag"
+}
+```
+
 ## Contribuição
 
 Contribuições são bem-vindas! Se encontrar algum problema ou tiver sugestões, por favor, abra uma [issue](https://github.com/JoseEduardoMartins/customer-manager-backend/issues/new).
