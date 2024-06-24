@@ -1,4 +1,4 @@
-import repository from '../repositories/tag.repository';
+import repository from '../repositories/customer-tag.repository';
 
 export const find = async (req, res) => {
     try {
@@ -12,25 +12,17 @@ export const find = async (req, res) => {
     }
 };
 
-export const findById = async (req, res) => {
-    try {
-        const id = Number(req.params.id);
-
-        const response = await repository.selectById(id);
-
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error);
-    }
-};
-
 export const save = async (req, res) => {
     try {
-        const tag = req.body;
+        const { customer_id, tags } = req.body;
 
-        const response = await repository.insert(tag);
+        for (let index = 0; index < tags.length; index++) {
+            const tag_id = tags[index];
 
-        res.status(201).json(response);
+            await repository.insert({ customer_id, tag_id });
+        }
+
+        res.status(204).json({});
     } catch (error) {
         res.status(500).json(error);
     }
@@ -38,11 +30,15 @@ export const save = async (req, res) => {
 
 export const update = async (req, res) => {
     try {
-        const id = Number(req.params.id);
-        const tag = req.body;
+        const { customer_id, tags } = req.body;
 
-        const response = await repository.update(id, tag);
-        if (response === null) return res.status(404).json({ message: 'Not found' });
+        await repository.remove({ customer_id });
+
+        for (let index = 0; index < tags.length; index++) {
+            const tag_id = tags[index];
+
+            await repository.insert({ customer_id, tag_id });
+        }
 
         res.sendStatus(204);
     } catch (error) {
@@ -52,9 +48,9 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const filters = req.query;
 
-        const response = await repository.remove(id);
+        const response = await repository.remove(filters);
         if (response === null) return res.status(404).json({ message: 'Not found' });
 
         res.sendStatus(204);
@@ -65,7 +61,6 @@ export const remove = async (req, res) => {
 
 export default {
     find,
-    findById,
     save,
     update,
     remove,

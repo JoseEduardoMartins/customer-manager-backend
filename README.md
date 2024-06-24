@@ -6,13 +6,20 @@ Este projeto é um sistema simples de gerenciamento de clientes desenvolvido em 
 
 Certifique-se de ter as seguintes dependências instaladas antes de iniciar:
 
+Opção 1
+
 -   [Node.js](https://nodejs.org/) (versão 16.17.0 ou superior)
--   MySQL (versão 8.0.35 ou superior)
 -   Pacotes [npm](https://www.npmjs.com/) (Node Package Manager)
+-   [MySQL](https://www.mysql.com/downloads/) (versão 8.0.35 ou superior)
+
+Opção 2
+
+-   [Docker](https://docs.docker.com/get-docker/)
+-   [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Instruções de Configuração
 
-1. Clone o repositório
+### 1. Clone o repositório
 
 ```bash
 git clone https://github.com/JoseEduardoMartins/customer-manager-backend.git
@@ -20,35 +27,87 @@ git clone https://github.com/JoseEduardoMartins/customer-manager-backend.git
 cd customer-manager-backend
 ```
 
-2. Criar o Banco de Dados e adicionar Dados Iniciais:
+### 2. Configurar ambiente.
 
-    - Se você ainda não o tiver instalado, siga as instruções na [documentação oficial](https://www.mysql.com/downloads/) para instalar o MySQL.
+#### Opção 1: Local
 
-    - Abra um terminal e execute o seguinte comando para criar um banco de dados e aplicar a estrutura inicial a partir do arquivo `schema.sql`:
+-   Instale as dependências:
 
-        ```
-        mysql -u seu_usuario -p sua_senha -h seu_host < ./database/schema.sql
+    ```bash
+    npm install
+    ```
 
-        ```
+-   Criar um arquivo `.env` na raiz do projeto com base no `.env.example` e mude as variaveis se necessario.
 
-    - Se você tiver um arquivo `seeds.sql` com dados iniciais, execute o seguinte comando para adicioná-los:
-        ```
-        mysql -u seu_usuario -p sua_senha -h seu_host < ./database/seed.sql
-        ```
+    ```bash
+    APP_PORT=3000
+    APP_PATH=/api
+    ```
 
-3. Instale as dependências:
+-   Se você ainda não o tiver instalado, siga as instruções na [documentação oficial](https://www.mysql.com/downloads/) para instalar o MySQL.
 
-```bash
- npm install
-```
+-   Adicione as credenciais do banco de dados no arquivo `.env`:
 
-6. Configure as variáveis de ambiente. Renomeie o arquivo `.env.example` para `.env` e preencha as informações necessárias.
+    ```bash
+    DB_HOST=localhost
+    DB_USER=seu_usuario
+    DB_PASSWORD=sua_senha
+    DB_NAME=customer-manager-db
+    ```
 
-7. Inicie o microserviço:
+-   Abra um terminal e execute o seguinte comando para criar um banco de dados e aplicar a estrutura inicial a partir do arquivo `schema.sql`:
 
-```bash
-npm run dev
-```
+    ```bash
+    mysql -u seu_usuario -p sua_senha -h seu_host < ./database/schema.sql
+
+    ```
+
+-   Se você tiver um arquivo `seeds.sql` com dados iniciais, execute o seguinte comando para adicioná-los:
+    ```bash
+    mysql -u seu_usuario -p sua_senha -h seu_host < ./database/seed.sql
+    ```
+
+#### Opção 2: Utilizando Docker
+
+-   Certifique-se de que o [Docker](https://docs.docker.com/get-docker/) e o [Docker Compose](https://docs.docker.com/compose/install/) estão instalados e rodando em sua máquina.
+
+-   Certifique-se de configurar corretamente as variáveis de ambiente no arquivo `docker-compose.yml` para conectar ao banco de dados.
+
+### 4. Executar a Aplicação
+
+#### Opção 1: Local
+
+-   Inicie a aplicação:
+
+    ```bash
+    npm run start:prod
+    ```
+
+-   Observe o código-fonte e reconstrua/atualize a aplicação quando os arquivos forem atualizados:
+
+    ```bash
+    npm run start:dev
+    ```
+
+#### Opção 2: Utilizando Docker
+
+-   Inicie a aplicação:
+
+    ```bash
+    docker-compose up
+    ```
+
+-   Crie imagens antes de iniciar contêineres:
+
+    ```bash
+    docker-compose up --build
+    ```
+
+-   Interrompe contêineres e remove contêineres, redes, volumes e imagens criadas pelo `up`:
+
+    ```bash
+    docker-compose down
+    ```
 
 O servidor estará disponível em http://localhost:3000.
 
@@ -71,9 +130,6 @@ Acesse a API para gerenciar os clientes e suas tags.
     "tags": [
         {
             "title": "tag 1"
-        },
-        {
-            "title": "tag 2"
         },
     ]
 }

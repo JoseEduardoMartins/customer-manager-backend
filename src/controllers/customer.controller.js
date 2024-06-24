@@ -4,9 +4,9 @@ import repositoryTag from '../repositories/tag.repository.js';
 
 export const find = async (req, res) => {
     try {
-        const filters = req.query;
+        const { selects, ...filters } = req.query;
 
-        const response = await repository.select({ filters });
+        const response = await repository.select({ selects, filters });
 
         res.status(200).json(response);
     } catch (error) {
@@ -26,11 +26,9 @@ export const findById = async (req, res) => {
             },
         });
 
-        console.log(tags);
-
         res.status(200).json({
             ...customer,
-            tags,
+            ...(tags && { tags }),
         });
     } catch (error) {
         res.status(500).json(error);
@@ -77,8 +75,10 @@ export const update = async (req, res) => {
         const id = Number(req.params.id);
         const { tags, ...customer } = req.body;
 
-        const responseCustomer = await repository.update(id, customer);
-        if (responseCustomer === null) return res.status(404).json({ message: 'Not found' });
+        if (Object.keys(customer).length) {
+            const responseCustomer = await repository.update(id, customer);
+            if (responseCustomer === null) return res.status(404).json({ message: 'Not found' });
+        }
 
         const responseCustomerTag = repositoryCustomerTag.remove({ customer_id: id });
         if (responseCustomerTag === null) return res.status(404).json({ message: 'Not found' });

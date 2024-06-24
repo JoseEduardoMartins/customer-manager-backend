@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `customer-manager-db`.`customer_tag` (
   `customer_id` INT NOT NULL,
   `tag_id` INT NOT NULL,
   PRIMARY KEY (`customer_id`, `tag_id`),
-  INDEX `fk_customer_tag_tag1_idx` (`tag_id` ASC) VISIBLE,
+  INDEX `fk_customer_tag_tag1_idx` (`tag_id` ASC),
   CONSTRAINT `fk_customer_tag_customer`
     FOREIGN KEY (`customer_id`)
     REFERENCES `customer-manager-db`.`customer` (`id`)

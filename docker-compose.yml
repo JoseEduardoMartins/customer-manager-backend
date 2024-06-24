@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+    customer-manager-backend:
+        container_name: 'customer-manager-backend'
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        ports:
+            - '3000:3000'
+        environment:
+            APP_PORT: 3000
+            APP_PATH: '/api'
+            DATABASE_HOST: db
+            DATABASE_USER: 'root'
+            DATABASE_PASSWORD: 'root'
+            DATABASE_NAME: 'customer-manager-db'
+        depends_on:
+            - db
+
+    db:
+        container_name: 'customer-manager-db'
+        image: mysql:5.7
+        restart: always
+        ports:
+            - '3307:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: customer-manager-db
+        volumes:
+            - ./database/schema.sql:/docker-entrypoint-initdb.d/init.sql

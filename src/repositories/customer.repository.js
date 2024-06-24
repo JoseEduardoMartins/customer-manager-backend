@@ -1,13 +1,13 @@
-import { Customer } from '../models/customer.model';
 import { runQuery } from '../config/database';
+import { Customer } from '../models/customer.model';
+import { customerParameters, customerReturnTypes, customerSelect } from '../utils/sql/customer.query.js';
+import { getQueryFilters, getQuerySelects } from '../utils/sql/queries';
 import { typeValidators } from '../utils/type-utils';
-import { getQueryFilters } from '../utils/sql/queries';
-import { customerParameters } from '../utils/sql/customer.query.js';
 
-export const select = async ({ filters = {} }) => {
+export const select = async ({ selects = customerReturnTypes.middle, filters = {} }) => {
     try {
         const query = `
-            SELECT *
+            SELECT ${getQuerySelects(selects, customerSelect)}
             FROM customer
             ${getQueryFilters(filters, customerParameters)}
         `;
