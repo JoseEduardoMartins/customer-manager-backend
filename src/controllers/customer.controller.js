@@ -75,8 +75,10 @@ export const update = async (req, res) => {
         const id = Number(req.params.id);
         const { tags, ...customer } = req.body;
 
-        const responseCustomer = await repository.update(id, customer);
-        if (responseCustomer === null) return res.status(404).json({ message: 'Not found' });
+        if (Object.keys(customer).length) {
+            const responseCustomer = await repository.update(id, customer);
+            if (responseCustomer === null) return res.status(404).json({ message: 'Not found' });
+        }
 
         const responseCustomerTag = repositoryCustomerTag.remove({ customer_id: id });
         if (responseCustomerTag === null) return res.status(404).json({ message: 'Not found' });
